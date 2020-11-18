@@ -1,25 +1,26 @@
 let equation = document.getElementById("equation"),
     result = document.getElementById("result"),
     num = document.querySelectorAll(".num"),
-    firstNumber = "",
-    secondNumber = null,
+    inputNum = "",
+    subTotal = 0,
     span = document.createElement("span"),
     cancel = document.getElementById('cancel'),
     equal = document.getElementById('equal'),
     opDisplay = "",
+    equalBtnPreviouslyClicked = true,
     multiply = (a, b) => a * b,
     addition = (a, b) => a + b,
-    subtraction = (a, b) => b - a,
-    division = (a, b) => b / a;
+    subtraction = (a, b) => a - b,
+    division = (a, b) => a / b;
 
 
 num.forEach(num => {
     num.addEventListener("click", function () {
-        firstNumber += num.textContent;
+        inputNum += num.textContent;
         opDisplay += num.textContent;
-        result.appendChild(span).textContent = firstNumber;
+        //result.appendChild(span).textContent = inputNum;
         equation.textContent = opDisplay;
-        console.log(firstNumber);
+        console.log(inputNum);
     })
 });
 
@@ -28,19 +29,30 @@ let previousOp = null;
 let ops = document.getElementsByClassName("op");
 for (let op of ops) {
     op.onclick = function () {
-        if ((this.textContent === '-' || this.textContent === '+') && secondNumber === null) {
-            secondNumber = 0;
-        } else if ((this.textContent === '×' || this.textContent === '÷') && secondNumber === null) {
-            secondNumber = 1;
+
+        // Initialisation du sous total pour la première fois où on cliquerai sur un bouton d'opération
+        if (previousOp === null) {
+            subTotal = parseFloat(inputNum);
         }
-        if (previousOp !== null) {
-            secondNumber = previousOp(parseFloat(firstNumber), parseFloat(secondNumber));
-        } else {
-            secondNumber = firstNumber;
+
+        // Vérification si le bouton = a été cliqué avant
+        // Si oui, on ne lance aucun calcul
+        // Si non, cela signifie qu'on a démandé une opération du type "1 + 1 + 1" et dans ce cas, on lance le calcul intermédiaire pour le "1 + 1"
+        if (!equalBtnPreviouslyClicked) {
+            subTotal = previousOp(parseFloat(subTotal), parseFloat(inputNum) );
+            result.appendChild(span).textContent = subTotal;
         }
-        firstNumber = "";
+        // On positionne la vérification du bouton egal à false pour pouvoir rentrer dans le cas de test ci-dessus
+        equalBtnPreviouslyClicked = false;
+
+        // Reinitialisation de la variable de saisie de nombre
+        inputNum = "";
+        
+        // Affichage de l'opération
         opDisplay += " " + this.textContent + " ";
         equation.textContent = opDisplay;
+
+        // Sauvegarde de l'opération demandée
         switch (this.textContent) {
             case "+":
                 previousOp = addition;
@@ -57,21 +69,29 @@ for (let op of ops) {
             default:
                 break;
         }
-
     };
 }
 
 equal.onclick = function () {
-    if (previousOp !== null) {
-        secondNumber = previousOp(parseFloat(firstNumber), parseFloat(secondNumber));
+    console.log(inputNum);
+    if (Number.isNaN(parseFloat(subTotal)) || Number.isNaN(parseFloat(inputNum))) {
+        return;
     }
-    result.appendChild(span).textContent = secondNumber;
+
+    if (previousOp !== null) {
+        subTotal = previousOp(parseFloat(subTotal), parseFloat(inputNum));
+    }
+
+    inputNum = "";
+    result.appendChild(span).textContent = subTotal;
+    equalBtnPreviouslyClicked = true;
 }
 
 cancel.onclick = function () {
-    firstNumber = "";
-    secondNumber = null;
-    result.appendChild(span).textContent = 0;
+    inputNum = "";
     opDisplay = "";
-    equation.textContent = opDisplay;
+    subTotal = null;
+    result.appendChild(span).textContent = 0;
+    equation.innerHTML = "&nbsp;";
+    previousOp = null;
 }

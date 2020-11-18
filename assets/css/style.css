@@ -1,16 +1,23 @@
 body {
-    color: white;
     background-color: #000000;
 }
 
-span{
+.text-white {
+    color: white;
+}
+
+.screen {
+    height: 2rem;
+}
+
+.reset {
+    color: #000000;
+}
+
+.result-size {
     font-size: 2rem;
-    text-align: right;
 }
 
-div{
-
-}
 .btn {
     border-radius: 100px;
     margin: 0.4em;
@@ -30,12 +37,8 @@ div{
 
 .cancelbtn {
     background-color: #a6a6a6;
-    color: white;
-    border: none;
-}
-
-.featurebtn {
-    background-color: black;
+    color: black;
+    font-weight: bold;
     border: none;
 }
 
